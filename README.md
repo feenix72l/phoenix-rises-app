@@ -1,37 +1,37 @@
 # Phoenix Rises
 
-This project is a single-page mobile-style app dashboard for a Phoenix Rises experience. It is created as a lightweight front-end app that can be opened directly in a browser or deployed with a static hosting platform.
+This project is a single-page mobile-style app dashboard for the Phoenix Rises experience. It is designed to run directly in a browser and can also be hosted as a static website for public access.
 
-## Features
+## Main files
 
-- Interactive homepage with live earnings panel
-- Start/Stop operational control
-- Live activity log
-- Wallet and payout screen
-- Profile screen
-- Withdrawal modal flow
-- Mobile-first responsive layout
+- `index.html` — public landing page with download button and QR code section
+- `Phoenix-Rises-App.html` — the actual app file
 
-## Run locally
+## How to use
 
-Open `index.html` in your browser.
+1. Open `index.html` locally in a browser to view the landing page.
+2. Click the "Download App" button to download the app file.
+3. Open the downloaded app file in a browser to use it.
 
-## Deploy for QR access
+## GitHub Pages deployment
 
-Upload the project to a static hosting service such as GitHub Pages, Netlify, or Vercel.
+To publish the app for a QR-code URL:
 
-After deployment, your public URL can be used for a QR code generator.
+1. Open your repository on GitHub.
+2. Go to Settings > Pages.
+3. Select the main branch and save.
+4. After deployment, your URL will look like:
 
-Example QR URL:
+`https://feenix72l.github.io/phoenix-rises-app/`
 
-`https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=YOUR_LIVE_URL`
+Then generate a QR code with:
+
+`https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=https://feenix72l.github.io/phoenix-rises-app/`
 
 ## Repository
-
-This app is published in the repository:
 
 `https://github.com/feenix72l/phoenix-rises-app`
 
 ## Notes
 
-This is a front-end prototype and is intended for demo and presentation use.
+This is a frontend demo app and is intended for presentation, download, and testing use.

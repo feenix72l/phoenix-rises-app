@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Phoenix Rises</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #050510; color: #fff; min-height: 100vh; overflow-x: hidden; padding-bottom: 80px; }
+
+    .screen { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .header { text-align: center; padding: 20px 10px 10px; }
+    .phoenix-logo { font-size: 45px; filter: drop-shadow(0 0 15px #ff6600); animation: glow 2s ease-in-out infinite alternate; }
+    @keyframes glow { from { filter: drop-shadow(0 0 15px #ff6600); } to { filter: drop-shadow(0 0 30px #ff0066); } }
+    .app-title { font-size: 24px; font-weight: 900; background: linear-gradient(90deg, #ff0066, #ff6600, #00ff88, #00ccff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; margin-top: 5px; }
+
+    .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 15px; font-size: 11px; }
+    .user-name { color: #00ff88; font-weight: bold; font-size: 13px; }
+    .system-status { color: #00ff88; }
+
+    .earnings-card { padding: 15px; background: linear-gradient(135deg, rgba(0,200,255,0.1), rgba(150,0,255,0.1)); border: 1px solid #00ccff; border-radius: 15px; box-shadow: 0 0 20px rgba(0,200,255,0.15); margin-bottom: 15px; text-align: center; }
+    .total-amount { font-size: 34px; font-weight: 900; color: #00ff88; margin: 5px 0; }
+
+    .middle-section { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 8px; margin-bottom: 15px; }
+    .agents-box, .payout-box { background: rgba(0,0,0,0.4); border: 1px solid rgba(0,200,255,0.3); border-radius: 12px; padding: 10px 5px; text-align: center; }
+    .agents-count { font-size: 18px; font-weight: 900; color: #00ff88; margin: 5px 0; }
+    .progress-bar { width: 100%; height: 5px; background: #1a1a2e; border-radius: 3px; margin: 6px 0; overflow: hidden; }
+    .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #00ff88, #00ccff); transition: width 0.3s ease; }
+    .uptime-value { font-size: 13px; color: #00ff88; font-weight: bold; margin-top: 5px; }
+
+    .start-btn-container { display: flex; justify-content: center; align-items: center; }
+    .start-btn { width: 90px; height: 90px; border-radius: 50%; background: radial-gradient(circle, #1a0033, #330066); border: 3px solid #ff00ff; box-shadow: 0 0 20px #ff00ff; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
+    .start-btn:active { transform: scale(0.92); }
+    .start-btn.active { background: radial-gradient(circle, #003300, #006600); border-color: #00ff88; box-shadow: 0 0 30px #00ff88; }
+    .power-icon { font-size: 24px; color: #00ccff; }
+    .start-btn.active .power-icon { color: #00ff88; }
+    .start-text { font-size: 13px; font-weight: 900; color: #fff; margin-top: 2px; }
+
+    .activity-log { background: rgba(0,0,0,0.6); border: 1px solid #00ccff; border-radius: 12px; padding: 10px; height: 140px; overflow-y: auto; font-family: monospace; font-size: 11px; margin-bottom: 15px; }
+    .log-entry { margin-bottom: 4px; color: #aaa; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 2px; }
+    .log-entry.success { color: #00ff88; }
+    .log-entry.earning { color: #ffcc00; font-weight: bold; }
+
+    .wallet-card { background: linear-gradient(135deg, #1a0b2e, #0f172a); border: 1px solid #9900ff; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 15px; box-shadow: 0 0 20px rgba(150,0,255,0.2); }
+    .wallet-balance { font-size: 36px; font-weight: 900; color: #00ff88; margin: 10px 0; }
+    .wallet-address { background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; font-family: monospace; font-size: 11px; color: #aaa; word-break: break-all; margin-top: 10px; border: 1px dashed #555; }
+
+    .payout-methods { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+    .method-btn { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px 5px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .method-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
+    .method-icon { font-size: 24px; margin-bottom: 5px; }
+    .method-name { font-size: 11px; font-weight: bold; color: #fff; }
+
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: #121225; border: 1px solid #00ccff; border-radius: 15px; padding: 25px; width: 100%; max-width: 350px; box-shadow: 0 0 30px rgba(0,200,255,0.3); }
+    .modal-title { font-size: 20px; font-weight: 900; color: #00ccff; margin-bottom: 15px; text-align: center; }
+    .input-group { margin-bottom: 15px; }
+    .input-label { font-size: 12px; color: #aaa; margin-bottom: 5px; display: block; }
+    .input-field { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 14px; }
+    .input-field:focus { outline: none; border-color: #00ccff; }
+    .modal-btn { width: 100%; padding: 14px; background: linear-gradient(90deg, #00ccff, #00ff88); border: none; border-radius: 10px; color: #000; font-weight: 900; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    .modal-btn:active { transform: scale(0.98); }
+    .modal-btn.cancel { background: rgba(255,255,255,0.1); color: #fff; margin-top: 10px; }
+
+    .profile-card { background: rgba(0,0,0,0.4); border: 1px solid #00ccff; border-radius: 15px; padding: 20px; text-align: center; margin-top: 20px; }
+    .profile-avatar { width: 80px; height: 80px; background: linear-gradient(135deg, #ff0066, #00ccff); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+    .stat-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
+    .stat-label { color: #aaa; }
+    .stat-value { color: #fff; font-weight: bold; }
+
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-around; padding: 12px 0; background: rgba(5,5,16,0.98); border-top: 1px solid rgba(0,200,255,0.3); backdrop-filter: blur(10px); z-index: 100; }
+    .nav-item { text-align: center; font-size: 10px; color: #666; cursor: pointer; transition: color 0.2s; flex: 1; }
+    .nav-item.active { color: #00ccff; }
+    .nav-icon { font-size: 22px; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div id="screen-home" class="screen active">
+    <div class="header">
+      <div class="phoenix-logo">🔥</div>
+      <div class="app-title">PHOENIX RISES</div>
+    </div>
+    <div class="top-bar">
+      <div><div class="user-name">PhoenixRisesUser</div><div style="color:#00ff88; font-size:10px;">✓ Verified</div></div>
+      <div style="text-align:right;"><div class="system-status">🟢 Online</div><div style="color:#00ccff; font-size:11px; margin-top:4px;"> <span id="activeAgents">0</span>/50</div></div>
+    </div>
+    <div class="earnings-card">
+      <div style="font-size:11px; color:#aaa;">Total Live Earnings</div>
+      <div class="total-amount" id="totalEarnings">$245.67</div>
+    </div>
+    <div class="middle-section">
+      <div class="agents-box">
+        <div style="font-size:10px; color:#aaa;">Running</div>
+        <div class="agents-count"><span id="runningAgents">0</span>/50</div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div style="font-size:10px; color:#aaa; margin-top:5px;">Uptime</div>
+        <div class="uptime-value" id="uptime">00:00:00</div>
+      </div>
+      <div class="start-btn-container">
+        <div class="start-btn" id="startBtn">
+          <div class="power-icon" id="powerIcon">⏻</div>
+          <div class="start-text" id="startText">START</div>
+        </div>
+      </div>
+      <div class="payout-box">
+        <div style="font-size:10px; color:#aaa;">Next Payout</div>
+        <div style="font-size:15px; font-weight:900; color:#00ff88; margin:5px 0;">$128.45</div>
+        <div style="font-size:10px; color:#aaa; margin-top:5px;">Available</div>
+        <div style="font-size:13px; font-weight:900; color:#00ccff;" id="withdrawAmount">$245.67</div>
+      </div>
+    </div>
+    <div style="font-size:12px; font-weight:bold; color:#00ccff; margin-bottom:8px; padding-left:5px;">📡 Live Activity Log</div>
+    <div class="activity-log" id="activityLog"><div class="log-entry">> System initialized. Waiting for START...</div></div>
+  </div>
+
+  <div id="screen-finance" class="screen">
+    <div class="header"><div class="app-title">WALLET & PAYOUTS</div></div>
+    <div class="wallet-card">
+      <div style="color:#aaa; font-size:12px;">Available Balance</div>
+      <div class="wallet-balance" id="financeBalance">$245.67</div>
+      <div style="color:#888; font-size:11px; margin-top:5px;">Your Digital Wallet Address</div>
+      <div class="wallet-address">0x7842...PR001...F9A2...B4C1</div>
+    </div>
+    <div style="font-size:14px; font-weight:bold; color:#fff; margin-bottom:10px; padding-left:5px;">Transfer Funds To:</div>
+    <div class="payout-methods">
+      <div class="method-btn" onclick="openWithdrawModal('PayPal')"><div class="method-icon">️</div><div class="method-name">PayPal</div></div>
+      <div class="method-btn" onclick="openWithdrawModal('Bank')"><div class="method-icon">🏦</div><div class="method-name">Bank</div></div>
+      <div class="method-btn" onclick="openWithdrawModal('Crypto')"><div class="method-icon">₿</div><div class="method-name">Crypto</div></div>
+    </div>
+    <div style="font-size:14px; font-weight:bold; color:#fff; margin: 20px 0 10px 5px;">Recent Transactions</div>
+    <div style="background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px;">
+      <div style="display:flex; justify-content:space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <div><div style="font-size:13px; color:#fff;">Agent Earnings</div><div style="font-size:10px; color:#888;">Today, 10:42 AM</div></div>
+        <div style="color:#00ff88; font-weight:bold;">+$32.14</div>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding: 10px 0;">
+        <div><div style="font-size:13px; color:#fff;">Withdrawal to PayPal</div><div style="font-size:10px; color:#888;">Yesterday, 4:15 PM</div></div>
+        <div style="color:#ff4444; font-weight:bold;">-$50.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-profile" class="screen">
+    <div class="header"><div class="app-title">USER PROFILE</div></div>
+    <div class="profile-card">
+      <div class="profile-avatar">🦅</div>
+      <div style="font-size:20px; font-weight:bold;">PhoenixRisesUser</div>
+      <div style="color:#00ff88; font-size:12px; margin-top:5px;">✓ Verified Account</div>
+      <div style="color:#888; font-size:11px; margin-top:5px;">ID: 7842-PR-001</div>
+    </div>
+    <div class="profile-card" style="text-align:left; margin-top:15px;">
+      <div class="stat-row"><span class="stat-label">Account Status</span><span class="stat-value" style="color:#00ff88;">Active</span></div>
+      <div class="stat-row"><span class="stat-label">Tier Level</span><span class="stat-value" style="color:#ffcc00;">Gold Member</span></div>
+      <div class="stat-row"><span class="stat-label">Agent Capacity</span><span class="stat-value">50 / 50</span></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="withdrawModal">
+    <div class="modal-content">
+      <div class="modal-title" id="modalTitle">Withdraw to PayPal</div>
+      <div class="input-group">
+        <label class="input-label">Amount to Transfer ($)</label>
+        <input type="number" class="input-field" id="withdrawAmountInput" placeholder="0.00" />
+      </div>
+      <div class="input-group">
+        <label class="input-label" id="dynamicLabel">PayPal Email Address</label>
+        <input type="text" class="input-field" id="dynamicValue" placeholder="you@example.com" />
+      </div>
+      <button class="modal-btn" id="confirmBtn" onclick="processWithdrawal()">CONFIRM TRANSFER</button>
+      <button class="modal-btn cancel" onclick="closeWithdrawModal()">CANCEL</button>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="switchScreen('home', this)"><div class="nav-icon">🏠</div><div>Home</div></div>
+    <div class="nav-item" onclick="switchScreen('finance', this)"><div class="nav-icon">💰</div><div>Wallet</div></div>
+    <div class="nav-item" onclick="switchScreen('profile', this)"><div class="nav-icon">👤</div><div>Profile</div></div>
+  </div>
+
+  <script>
+    let isRunning = false;
+    let uptimeSeconds = 0;
+    let totalEarnings = 245.67;
+    let activeAgentsCount = 0;
+    let uptimeInterval, earningsInterval, logInterval;
+    const startBtn = document.getElementById('startBtn');
+    const powerIcon = document.getElementById('powerIcon');
+    const startText = document.getElementById('startText');
+    const activityLog = document.getElementById('activityLog');
+
+    function vibrate(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+    function switchScreen(screenName, navElement) {
+      vibrate(20);
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + screenName).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (navElement) navElement.classList.add('active');
+    }
+
+    function addLog(message, type = 'normal') {
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit' });
+      const entry = document.createElement('div');
+      entry.className = 'log-entry ' + type;
+      entry.textContent = `[${time}] ${message}`;
+      activityLog.appendChild(entry);
+      activityLog.scrollTop = activityLog.scrollHeight;
+      if (activityLog.children.length > 50) activityLog.removeChild(activityLog.firstChild);
+    }
+
+    startBtn.addEventListener('click', function() {
+      vibrate(50);
+      isRunning = !isRunning;
+      if (isRunning) {
+        startBtn.classList.add('active');
+        powerIcon.textContent = '⏹';
+        startText.textContent = 'STOP';
+        addLog('INITIATING SEQUENCE: Deploying 50 AI Agents...', 'success');
+        let bootCount = 0;
+        const bootInterval = setInterval(() => {
+          if (bootCount >= 10) { clearInterval(bootInterval); addLog('DEPLOYMENT COMPLETE.', 'success'); return; }
+          bootCount++;
+          activeAgentsCount = bootCount * 5;
+          document.getElementById('activeAgents').textContent = activeAgentsCount;
+          document.getElementById('runningAgents').textContent = activeAgentsCount;
+          document.getElementById('progressFill').style.width = (activeAgentsCount * 2) + '%';
+        }, 100);
+        uptimeInterval = setInterval(() => {
+          uptimeSeconds++;
+          const h = String(Math.floor(uptimeSeconds / 3600)).padStart(2, '0');
+          const m = String(Math.floor((uptimeSeconds % 3600) / 60)).padStart(2, '0');
+          const s = String(uptimeSeconds % 60).padStart(2, '0');
+          document.getElementById('uptime').textContent = `${h}:${m}:${s}`;
+        }, 1000);
+        earningsInterval = setInterval(() => {
+          const earned = Math.random() * 0.45;
+          totalEarnings += earned;
+          const formatted = '$' + totalEarnings.toFixed(2);
+          document.getElementById('totalEarnings').textContent = formatted;
+          document.getElementById('withdrawAmount').textContent = formatted;
+          document.getElementById('financeBalance').textContent = formatted;
+        }, 500);
+        logInterval = setInterval(() => {
+          if(!isRunning) return;
+          const tasks = ['Web Research', 'Translation', 'Image Gen', 'Data Scraping', 'Social Post'];
+          const task = tasks[Math.floor(Math.random() * tasks.length)];
+          const agentNum = String(Math.floor(Math.random() * 50) + 1).padStart(2, '0');
+          const amount = (Math.random() * 0.8).toFixed(2);
+          addLog(`Agent ${agentNum} completed ${task}. +$${amount}`, 'earning');
+        }, 800);
+      } else {
+        startBtn.classList.remove('active');
+        powerIcon.textContent = '⏻';
+        startText.textContent = 'START';
+        addLog('HALT COMMAND: Terminating processes.', 'normal');
+        activeAgentsCount = 0;
+        document.getElementById('activeAgents').textContent = '0';
+        document.getElementById('runningAgents').textContent = '0';
+        document.getElementById('progressFill').style.width = '0%';
+        clearInterval(uptimeInterval); clearInterval(earningsInterval); clearInterval(logInterval);
+      }
+    });
+
+    function openWithdrawModal(method) {
+      vibrate(30);
+      document.getElementById('withdrawModal').classList.add('active');
+      document.getElementById('modalTitle').textContent = `Withdraw to ${method}`;
+      document.getElementById('withdrawAmountInput').value = '';
+      document.getElementById('dynamicValue').value = '';
+      document.getElementById('confirmBtn').textContent = 'CONFIRM TRANSFER';
+      document.getElementById('confirmBtn').style.opacity = '1';
+      const label = document.getElementById('dynamicLabel');
+      if(method === 'PayPal') label.textContent = 'PayPal Email Address';
+      else if(method === 'Bank') label.textContent = 'Bank Account / Routing Number';
+      else if(method === 'Crypto') label.textContent = 'Wallet Address (BTC/ETH/USDT)';
+    }
+
+    function closeWithdrawModal() {
+      vibrate(20);
+      document.getElementById('withdrawModal').classList.remove('active');
+    }
+
+    function processWithdrawal() {
+      vibrate(50);
+      const amount = parseFloat(document.getElementById('withdrawAmountInput').value);
+      const details = document.getElementById('dynamicValue').value;
+      const method = document.getElementById('modalTitle').textContent.replace('Withdraw to ', '');
+      if(!amount || !details || amount <= 0) {
+        alert('Please fill in all fields with valid information.');
+        return;
+      }
+      if(amount > totalEarnings) {
+        alert('Insufficient funds! You cannot withdraw more than your current balance.');
+        return;
+      }
+      const btn = document.getElementById('confirmBtn');
+      btn.textContent = 'PROCESSING...';
+      btn.style.opacity = '0.7';
+      setTimeout(() => {
+        totalEarnings -= amount;
+        const formatted = '$' + totalEarnings.toFixed(2);
+        document.getElementById('totalEarnings').textContent = formatted;
+        document.getElementById('withdrawAmount').textContent = formatted;
+        document.getElementById('financeBalance').textContent = formatted;
+        btn.textContent = 'CONFIRM TRANSFER';
+        btn.style.opacity = '1';
+        closeWithdrawModal();
+        alert(`SUCCESS! $${amount.toFixed(2)} has been sent to your ${method} account.\n\nFunds will arrive in 1-3 business days.`);
+        addLog(`WITHDRAWAL: $${amount.toFixed(2)} sent to ${method}.`, 'success');
+      }, 1500);
+    }
+
+    addLog('System ready. Press START to begin operations.');
+  </script>
+</body>
+</html>
